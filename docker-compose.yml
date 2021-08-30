@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  data-node:
+    image: sagebionetworks/synapse-drs
+    build:
+      context: server
+      dockerfile: Dockerfile
+    container_name: synapse-drs
+    restart: always
+    # environment:
+    #   - SERVER_PROTOCOL=${SERVER_PROTOCOL}
+    #   - SERVER_DOMAIN=${SERVER_DOMAIN}
+    #   - SERVER_PORT=${SERVER_PORT}
+    #   - DB_PROTOCOL=${DB_PROTOCOL}
+    #   - DB_DOMAIN=db
+    #   - DB_PORT=${DB_PORT}
+    #   - DB_DATABASE=${DB_DATABASE}
+    #   - DB_USERNAME=${DB_USERNAME}
+    #   - DB_PASSWORD=${DB_PASSWORD}
+    # healthcheck:
+    #   test: curl --fail http://localhost:8080/api/v1/healthCheck
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    ports:
+      - "80:8080"
+
+# http://0.0.0.0/ga4gh/drs/v1/ui/
