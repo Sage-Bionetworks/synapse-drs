@@ -21,7 +21,20 @@ def get_access_url(object_id, access_id):  # noqa: E501
 
     :rtype: AccessURL
     """
-    return 'do some magic'
+    synapse_pat = connexion.request.headers['Authorization']
+    syn = synapseclient.Synapse()
+    syn.login(authToken=synapse_pat)
+    ent = syn.get(object_id, downloadFile=False)
+    if ent.concreteType.endswith("FileEntity"):
+        download_file = syn._getFileHandleDownload(
+            fileHandleId=ent._file_handle.id,
+            objectId=ent.id,
+            objectType="FileEntity"
+        )
+        results = AccessURL(url=download_file['preSignedURL'])
+    else:
+        results = Error(msg="Entity type not supported", status_code=415)
+    return results
 
 
 def get_object(object_id, expand=None):  # noqa: E501
@@ -39,15 +52,18 @@ def get_object(object_id, expand=None):  # noqa: E501
     synapse_pat = connexion.request.headers['Authorization']
     syn = synapseclient.Synapse()
     syn.login(authToken=synapse_pat)
-    ent = syn.get(object_id)
-    drs_object = DrsObject(
-        id=object_id,
-        name=ent.name,
-        self_uri=f"drs://drs.synapse.example/{object_id}",
-        size=ent.fileSize,
-        created_time=ent.createdOn,
-        checksums=[ent.md5],
-        version=ent.versionNumber,
-        updated_time=ent.modifiedOn
-    )
-    return drs_object
+    ent = syn.get(object_id, downloadFile=False)
+    if ent.concreteType.endswith("FileEntity"):
+        results = DrsObject(
+            id=object_id,
+            name=ent.name,
+            self_uri=f"drs://drs.synapse.example/{object_id}",
+            size=ent.fileSize,
+            created_time=ent.createdOn,
+            checksums=[ent.md5],
+            version=ent.versionNumber,
+            updated_time=ent.modifiedOn
+        )
+    else:
+        results = Error(msg="Entity type not supported", status_code=415)
+    return results
