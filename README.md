@@ -14,3 +14,5 @@ openapi-generator generate \
 ```
 docker-compose up
 ```
+
+You can access the instance locally at http://0.0.0.0/ga4gh/drs/v1/ui/.  By authenticating with your Synapse PAT, you can access Synapse entities.
